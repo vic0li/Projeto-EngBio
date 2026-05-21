@@ -125,7 +125,7 @@ if uploaded_file is not None:
         image = image.convert("RGB")
 
         st.markdown("### 🖼️ Imagem carregada")
-        st.image(image, use_container_width=True)
+        st.image(image, width=500)
 
         # ✅ mostrar info da imagem
         st.caption(f"Resolução original: {image.size}")
