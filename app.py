@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # =========================
-# ESTILO (CSS LIMPO E PROFISSIONAL)
+# ESTILO (CSS)
 # =========================
 st.markdown("""
 <style>
@@ -98,6 +98,13 @@ classes = [
 ]
 
 # =========================
+# DESCOBRIR TAMANHO DO MODELO (AUTOMÁTICO)
+# =========================
+input_shape = model.input_shape
+img_height = input_shape[1]
+img_width = input_shape[2]
+
+# =========================
 # UPLOAD
 # =========================
 st.markdown("### 📤 Upload da Imagem de Ressonância Magnética")
@@ -114,14 +121,17 @@ if uploaded_file is not None:
     try:
         image = Image.open(uploaded_file)
 
-        # ✅ CORREÇÃO CRÍTICA: garantir RGB
+        # ✅ garantir RGB
         image = image.convert("RGB")
 
         st.markdown("### 🖼️ Imagem carregada")
         st.image(image, use_container_width=True)
 
-        # ✅ CORREÇÃO CRÍTICA: tamanho correto
-        img = image.resize((128, 128))
+        # ✅ mostrar info da imagem
+        st.caption(f"Resolução original: {image.size}")
+
+        # ✅ resize automático baseado no modelo
+        img = image.resize((img_width, img_height))
 
         img = np.array(img) / 255.0
         img = np.expand_dims(img, axis=0)
@@ -141,7 +151,7 @@ if uploaded_file is not None:
         <div class="box">
             <div class="result">Diagnóstico: {predicted_class}</div>
             <br>
-            <div style="text-align:center; font-size:18px; color:black;">
+            <div style="text-align:center; font-size:18px;">
                 Confiança: <b>{confidence:.2f}%</b>
             </div>
         </div>
