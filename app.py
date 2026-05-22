@@ -212,11 +212,12 @@ if uploaded_file is not None:
             st.image(image, width=350)
             st.caption(f"Resolução original: {image.size}")
 
-        # ✅ CORREÇÃO REAL 
+        # ✅ AJUSTE CORRETO (IGUAL AO TREINAMENTO)
         img = image.resize((img_width, img_height))
-        img = np.array(img)
+        img = np.array(img).astype("float32")
 
-        img = preprocess_input(img)  
+        # ✅ NORMALIZAÇÃO CORRETA (ESSENCIAL)
+        img = img / 255.0  
 
         img = np.expand_dims(img, axis=0)
 
