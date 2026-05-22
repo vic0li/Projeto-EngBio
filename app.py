@@ -5,7 +5,7 @@ from PIL import Image
 import os
 import gdown
 import pandas as pd
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input  # ✅ IMPORTANTE
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input  
 
 # =========================
 # CONFIGURAÇÃO DA PÁGINA
@@ -21,6 +21,7 @@ st.set_page_config(
 # =========================
 st.markdown("""
 <style>
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 html, body, [class*="css"] {
@@ -34,6 +35,7 @@ html, body, [class*="css"] {
     color: #3B82F6;
     font-size: 42px;
     font-weight: 700;
+    margin-bottom: 5px;
 }
 
 .subtitle {
@@ -47,6 +49,9 @@ html, body, [class*="css"] {
     background-color: #111827;
     padding: 35px;
     border-radius: 20px;
+    box-shadow: 0px 0px 25px rgba(0,0,0,0.25);
+    margin-top: 20px;
+    animation: fadeIn 0.8s ease-in;
 }
 
 .result-box {
@@ -54,6 +59,9 @@ html, body, [class*="css"] {
     padding: 30px;
     border-radius: 20px;
     text-align: center;
+    color: white;
+    margin-top: 20px;
+    box-shadow: 0px 0px 20px rgba(37,99,235,0.3);
 }
 
 .result-title {
@@ -65,6 +73,30 @@ html, body, [class*="css"] {
     font-size: 20px;
     margin-top: 10px;
 }
+
+.footer {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 40px;
+    color: #94A3B8;
+}
+
+.sidebar .sidebar-content {
+    background-color: #111827;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -72,18 +104,29 @@ html, body, [class*="css"] {
 # SIDEBAR
 # =========================
 with st.sidebar:
+
+    st.image("logo_puc.png", width=180)
+
     st.markdown("## 🧠 Sobre o Projeto")
+
     st.write("""
-    IA para auxiliar na detecção de tumores em exames de MRI.
+    Este projeto utiliza Inteligência Artificial e Deep Learning
+    para auxiliar na detecção de tumores cerebrais em imagens
+    de ressonância magnética (MRI).
     """)
 
-    st.markdown("### 📌 Classes")
+    st.markdown("### 📌 Classes Detectadas")
+
     st.write("• Glioma")
     st.write("• Meningioma")
     st.write("• Pituitária")
     st.write("• Sem Tumor")
 
-    st.warning("Projeto acadêmico.")
+    st.markdown("---")
+
+    st.warning(
+        "Projeto acadêmico. Não substitui avaliação médica profissional."
+    )
 
 # =========================
 # CABEÇALHO
@@ -91,25 +134,28 @@ with st.sidebar:
 st.markdown('<div class="main-title">Detecção de Tumor Cerebral</div>', unsafe_allow_html=True)
 
 st.markdown(
-    '<div class="subtitle">Engenharia Biomédica — PUC Campinas</div>',
+    '<div class="subtitle">Engenharia Biomédica — PUC Campinas<br>Emily Ferreira | Isabela Haga</div>',
     unsafe_allow_html=True
 )
 
 st.markdown("---")
 
+# =========================
+# CONTAINER PRINCIPAL
+# =========================
 st.markdown('<div class="main-box">', unsafe_allow_html=True)
 
 # =========================
-# DOWNLOAD MODELO
+# DOWNLOAD DO MODELO
 # =========================
 MODEL_URL = "https://drive.google.com/uc?id=1pB3o65554q1ntOKH0P4QvB6RswRPiGVG"
 
 if not os.path.exists("model.h5"):
-    with st.spinner("Baixando modelo..."):
+    with st.spinner("Baixando modelo de IA..."):
         gdown.download(MODEL_URL, "model.h5", quiet=False)
 
 # =========================
-# LOAD MODEL
+# CARREGAR MODELO
 # =========================
 @st.cache_resource
 def load_model():
@@ -117,6 +163,7 @@ def load_model():
 
 model = load_model()
 
+# ✅ NÃO MEXER (ESTÁ CORRETO)
 classes = [
     "Glioma",
     "Meningioma",
@@ -125,19 +172,26 @@ classes = [
 ]
 
 # =========================
-# TAMANHO INPUT
+# TAMANHO DO MODELO
 # =========================
 input_shape = model.input_shape
 img_height = input_shape[1]
 img_width = input_shape[2]
 
 # =========================
+# INTRODUÇÃO
+# =========================
+st.info(
+    "Faça upload de uma imagem de ressonância magnética para análise automática pelo modelo de Inteligência Artificial."
+)
+
+# =========================
 # UPLOAD
 # =========================
-st.markdown("## 📤 Upload")
+st.markdown("## 📤 Upload da Imagem")
 
 uploaded_file = st.file_uploader(
-    "Envie a imagem",
+    "Selecione uma imagem (JPG, JPEG, PNG)",
     type=["jpg", "jpeg", "png"]
 )
 
@@ -147,28 +201,33 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
 
     try:
-        image = Image.open(uploaded_file).convert("RGB")
 
-        col1, col2 = st.columns(2)
+        image = Image.open(uploaded_file)
+        image = image.convert("RGB")
+
+        col1, col2 = st.columns([1,1])
 
         with col1:
-            st.image(image, caption="Imagem enviada", width=300)
+            st.markdown("### 🖼️ Imagem Carregada")
+            st.image(image, width=350)
+            st.caption(f"Resolução original: {image.size}")
 
-        # ✅ PREPROCESSAMENTO CORRETO
+        # ✅ CORREÇÃO REAL 
         img = image.resize((img_width, img_height))
         img = np.array(img)
 
         img = preprocess_input(img)  
+
         img = np.expand_dims(img, axis=0)
 
-        # previsão
-        with st.spinner("Analisando..."):
+        with st.spinner("A IA está analisando a ressonância magnética..."):
             prediction = model.predict(img)
 
         predicted_class = classes[np.argmax(prediction)]
-        confidence = float(np.max(prediction))
+        confidence = np.max(prediction) * 100
 
         with col2:
+
             st.markdown("### 📊 Resultado")
 
             st.markdown(f"""
@@ -177,26 +236,37 @@ if uploaded_file is not None:
                     {predicted_class}
                 </div>
                 <div class="result-confidence">
-                    Confiança: <b>{confidence*100:.2f}%</b>
+                    Confiança: <b>{confidence:.2f}%</b>
                 </div>
             </div>
             """, unsafe_allow_html=True)
 
-            st.progress(confidence)
+            st.progress(float(confidence/100))
 
-            # gráfico
+            st.markdown("### 📈 Probabilidades")
+
             df = pd.DataFrame({
                 "Classe": classes,
-                "Probabilidade (%)": prediction[0] * 100
+                "Probabilidade": prediction[0] * 100
             })
 
             st.bar_chart(df.set_index("Classe"))
 
     except Exception as e:
-        st.error("Erro ao processar imagem.")
+        st.error("Erro ao processar a imagem. Tente outra imagem.")
         st.write(e)
 
+# =========================
+# FECHAR CONTAINER
+# =========================
 st.markdown('</div>', unsafe_allow_html=True)
 
+# =========================
+# RODAPÉ
+# =========================
 st.markdown("---")
-st.caption("Projeto acadêmico — Engenharia Biomédica (2026)")
+
+st.markdown(
+    "<div class='footer'>Projeto acadêmico — Engenharia Biomédica | PUC Campinas (2026)</div>",
+    unsafe_allow_html=True
+)
