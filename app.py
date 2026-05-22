@@ -12,7 +12,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input  # ✅ I
 # =========================
 st.set_page_config(
     page_title="Detecção de Tumor Cerebral",
-    #page_icon="🧠",
+    page_icon="🧠",
     layout="wide"
 )
 
@@ -88,7 +88,7 @@ with st.sidebar:
 # =========================
 # CABEÇALHO
 # =========================
-st.markdown('<div class="main-title">🧠 Detecção de Tumor Cerebral</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">Detecção de Tumor Cerebral</div>', unsafe_allow_html=True)
 
 st.markdown(
     '<div class="subtitle">Engenharia Biomédica — PUC Campinas</div>',
