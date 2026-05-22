@@ -12,7 +12,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input  # ✅ I
 # =========================
 st.set_page_config(
     page_title="Detecção de Tumor Cerebral",
-    page_icon="🧠",
+    #page_icon="🧠",
     layout="wide"
 )
 
