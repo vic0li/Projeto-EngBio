@@ -147,7 +147,7 @@ st.markdown('<div class="main-box">', unsafe_allow_html=True)
 # =========================
 # DOWNLOAD DO MODELO
 # =========================
-MODEL_URL = "https://drive.google.com/uc?id=1pB3o65554q1ntOKH0P4QvB6RswRPiGVG"
+MODEL_URL = "https://drive.google.com/uc?id=1Rhz9jC899ORxUtq4UNu33hh_AB6vtzWC"
 
 if not os.path.exists("model.h5"):
     with st.spinner("Baixando modelo de IA..."):
